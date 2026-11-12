@@ -1,5 +1,5 @@
-Package: derivadifusion
-Title: Dependencias de R del blog Deriva & Difusión
+Package: driftdiffusion
+Title: Dependencias de R del blog Drift & Diffusion
 Version: 0.1.0
 Description: Este archivo solo declara los paquetes de R que usan las
     entradas, para que GitHub Actions (y cualquier colaborador) pueda
@@ -8,5 +8,5 @@ Imports:
     ggplot2 (>= 3.4.0),
     knitr,
     rmarkdown
-URL: https://github.com/matcasti/derivadifusion
-BugReports: https://github.com/matcasti/derivadifusion/issues
+URL: https://github.com/matcasti/drift-diffusion
+BugReports: https://github.com/matcasti/drift-diffusion/issues
