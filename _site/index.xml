@@ -2506,7 +2506,7 @@ Fig.&nbsp;3.​ Sampling distribution of the estimator of <img src="https://late
 <p>In the <a href="../../posts/inflammatory-reflex/index.html">next post</a> we use this process as one piece of a larger model: an Ornstein–Uhlenbeck vagal tone whose mean <img src="https://latex.codecogs.com/png.latex?%5Cmu"> is no longer constant, because the immune system moves it.</p>
 
 
-<div class="dd-cite"><p><span class="dd-lbl">Cite as</span> Mati (2026). <em>The Ornstein–Uhlenbeck process: noise with memory</em>. Drift &amp; Diffusion, 1(11).</p></div>
+<div class="dd-cite"><p><span class="dd-lbl">Cite as</span> Matías Castillo-Aguilar (2026). <em>The Ornstein–Uhlenbeck process: noise with memory</em>. Drift &amp; Diffusion, 1(11).</p></div>
 
 </section>
 
@@ -3900,7 +3900,7 @@ font-style: inherit;">1</span>)</span></code></pre></div>
 <p>The second is physiological: Equation&nbsp;1 assumes independent errors, but real heart rate fluctuates with memory. Neighbouring beats resemble each other. Ignoring this makes the intervals too optimistic. The remedy is to model the noise as a stochastic process with temporal correlation, and the simplest of them all is the <a href="../../posts/ornstein-uhlenbeck/index.html">Ornstein–Uhlenbeck process</a>.</p>
 
 
-<div class="dd-cite"><p><span class="dd-lbl">Cite as</span> Mati (2026). <em>How fast does the heart recover? Metropolis–Hastings from scratch</em>. Drift &amp; Diffusion, 1(10).</p></div>
+<div class="dd-cite"><p><span class="dd-lbl">Cite as</span> Matías Castillo-Aguilar (2026). <em>How fast does the heart recover? Metropolis–Hastings from scratch</em>. Drift &amp; Diffusion, 1(10).</p></div>
 
 </section>
 
