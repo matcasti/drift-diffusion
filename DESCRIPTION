@@ -8,3 +8,5 @@ Imports:
     ggplot2 (>= 3.4.0),
     knitr,
     rmarkdown
+URL: https://github.com/matcasti/derivadifusion
+BugReports: https://github.com/matcasti/derivadifusion/issues
