@@ -102,12 +102,22 @@ de texto completo y RSS, todo generado por Quarto.
 
 ## Publicar en GitHub Pages
 
-1. En `_quarto.yml`, cambia `site-url` por la URL real.
-2. Sube el repositorio a GitHub con la rama `main`.
-3. En el repositorio: **Settings → Pages → Source: GitHub Actions**.
+El sitio vive en <https://driftdiffusion.com>. Cada `push` a `main` ejecuta
+`.github/workflows/publish.yml`, que instala Quarto, R y las fuentes,
+renderiza y publica.
 
-Cada `push` a `main` ejecuta `.github/workflows/publish.yml`, que instala
-Quarto, R y las fuentes, renderiza y publica.
+Configuración única:
+
+1. **Settings → Pages → Source: GitHub Actions.**
+2. **Settings → Pages → Custom domain:** `driftdiffusion.com`, y activa
+   *Enforce HTTPS* cuando el certificado esté listo.
+3. En el DNS del dominio:
+   - cuatro registros `A` para el apex: `185.199.108.153`,
+     `185.199.109.153`, `185.199.110.153`, `185.199.111.153`;
+   - (opcional) un `CNAME` de `www` a `matcasti.github.io`.
+
+`_site/` no se versiona: lo genera Actions. `_freeze/` sí, para que una
+entrada no vuelva a ejecutarse en cada publicación.
 
 ## Personalizar
 

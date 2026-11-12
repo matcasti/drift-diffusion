@@ -13,8 +13,8 @@ lang: en
 website:
   title: "Drift & Diffusion"
   description: "Bayesian statistics, stochastic processes and neuro-immuno-physiological modelling in R."
-  # CAMBIAR: URL pública del sitio (necesaria para el RSS y las tarjetas sociales).
-  site-url: "https://USUARIO.github.io/deriva-difusion"
+  # URL pública (necesaria para el RSS, el sitemap y las tarjetas sociales).
+  site-url: "https://driftdiffusion.com"
   favicon: assets/favicon.svg
   back-to-top-navigation: true
   search:

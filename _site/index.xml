@@ -6,15 +6,15 @@
       version="2.0">
 <channel>
 <title>Drift &amp; Diffusion</title>
-<link>https://USUARIO.github.io/deriva-difusion/</link>
-<atom:link href="https://USUARIO.github.io/deriva-difusion/index.xml" rel="self" type="application/rss+xml"/>
+<link>https://driftdiffusion.com/</link>
+<atom:link href="https://driftdiffusion.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>Bayesian statistics, stochastic processes and neuro-immuno-physiological modelling in R.</description>
 <generator>quarto-1.7.29</generator>
 <lastBuildDate>Tue, 10 Nov 2026 03:00:00 GMT</lastBuildDate>
 <item>
   <title>The inflammatory reflex as a stochastic dynamical system</title>
   <dc:creator>Matías Castillo-Aguilar</dc:creator>
-  <link>https://USUARIO.github.io/deriva-difusion/posts/inflammatory-reflex/</link>
+  <link>https://driftdiffusion.com/posts/inflammatory-reflex/</link>
   <description><![CDATA[ 
 
 
@@ -676,7 +676,7 @@ font-style: inherit;">NULL</span>)</span></code></pre></div>
 <div id="fig-experiments" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-experiments-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/inflammatory-reflex/index_files/figure-html/fig-experiments-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/inflammatory-reflex/index_files/figure-html/fig-experiments-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-experiments-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;1.​ Deterministic response to the same stimulus under three conditions. Top: cytokine. Bottom: efferent vagal activity reaching the tissue (zero after vagotomy).
@@ -883,7 +883,7 @@ font-style: inherit;">"Peak cytokine"</span>)</span></code></pre></div>
 <div id="fig-gain" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-gain-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/inflammatory-reflex/index_files/figure-html/fig-gain-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/inflammatory-reflex/index_files/figure-html/fig-gain-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gain-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;2.​ Peak cytokine as a function of reflex gain. The dot marks the reference value <img src="https://latex.codecogs.com/png.latex?g%20=%203">.
@@ -1119,7 +1119,7 @@ font-style: inherit;">"Cytokine C"</span>)</span></code></pre></div>
 <div id="fig-fan" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-fan-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/inflammatory-reflex/index_files/figure-html/fig-fan-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/inflammatory-reflex/index_files/figure-html/fig-fan-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fan-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;3.​ Cytokine response with noise (2000 paths). Thick line: median. Bands: central 50% and 90%. Thin lines: three individual paths.
@@ -1264,7 +1264,7 @@ font-style: inherit;">"Density"</span>)</span></code></pre></div>
 <div id="fig-peaks" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-peaks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/inflammatory-reflex/index_files/figure-html/fig-peaks-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/inflammatory-reflex/index_files/figure-html/fig-peaks-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-peaks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;4.​ Distribution of the cytokine peak over 2000 paths, with fixed vagal tone (dashed) and with the reflex active (solid).
@@ -1394,13 +1394,13 @@ Table&nbsp;III.​ Mean, standard deviation, coefficient of variation and 95th p
 </div></section></div> ]]></description>
   <category>neuro-immuno-physiology</category>
   <category>stochastic processes</category>
-  <guid>https://USUARIO.github.io/deriva-difusion/posts/inflammatory-reflex/</guid>
+  <guid>https://driftdiffusion.com/posts/inflammatory-reflex/</guid>
   <pubDate>Tue, 10 Nov 2026 03:00:00 GMT</pubDate>
 </item>
 <item>
   <title>The Ornstein–Uhlenbeck process: noise with memory</title>
   <dc:creator>Matías Castillo-Aguilar</dc:creator>
-  <link>https://USUARIO.github.io/deriva-difusion/posts/ornstein-uhlenbeck/</link>
+  <link>https://driftdiffusion.com/posts/ornstein-uhlenbeck/</link>
   <description><![CDATA[ 
 
 
@@ -1824,7 +1824,7 @@ font-style: inherit;">expression</span>(X[t]))</span></code></pre></div>
 <div id="fig-paths" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-paths-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/ornstein-uhlenbeck/index_files/figure-html/fig-paths-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/ornstein-uhlenbeck/index_files/figure-html/fig-paths-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-paths-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;1.​ Twelve paths with <img src="https://latex.codecogs.com/png.latex?%5Ctheta%20=%201">, <img src="https://latex.codecogs.com/png.latex?%5Cmu%20=%200">, <img src="https://latex.codecogs.com/png.latex?%5Csigma%20=%201"> and initial condition <img src="https://latex.codecogs.com/png.latex?x_0%20=%204">. Dashed line: theoretical mean. Band: ±2 theoretical standard deviations.
@@ -2029,7 +2029,7 @@ font-style: inherit;">"Simulated variance / exact variance"</span>)</span></code
 <div id="fig-bias" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-bias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/ornstein-uhlenbeck/index_files/figure-html/fig-bias-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/ornstein-uhlenbeck/index_files/figure-html/fig-bias-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;2.​ Simulated stationary variance, relative to the exact one, as a function of the dimensionless step <img src="https://latex.codecogs.com/png.latex?%5Ctheta%5CDelta">. Filled circles: Euler–Maruyama. Open circles: exact scheme. Line: prediction of the bias equation.
@@ -2489,7 +2489,7 @@ font-style: inherit;">"Density"</span>)</span></code></pre></div>
 <div id="fig-theta" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-theta-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/ornstein-uhlenbeck/index_files/figure-html/fig-theta-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/ornstein-uhlenbeck/index_files/figure-html/fig-theta-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-theta-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;3.​ Sampling distribution of the estimator of <img src="https://latex.codecogs.com/png.latex?%5Ctheta">, relative to the true value, for series lasting 10 and 100 time constants. The dotted line marks the unbiased value.
@@ -2522,13 +2522,13 @@ Fig.&nbsp;3.​ Sampling distribution of the estimator of <img src="https://late
 </div>
 </div></section></div> ]]></description>
   <category>stochastic processes</category>
-  <guid>https://USUARIO.github.io/deriva-difusion/posts/ornstein-uhlenbeck/</guid>
+  <guid>https://driftdiffusion.com/posts/ornstein-uhlenbeck/</guid>
   <pubDate>Sun, 01 Nov 2026 03:00:00 GMT</pubDate>
 </item>
 <item>
   <title>How fast does the heart recover? Metropolis–Hastings from scratch</title>
   <dc:creator>Matías Castillo-Aguilar</dc:creator>
-  <link>https://USUARIO.github.io/deriva-difusion/posts/metropolis-recovery/</link>
+  <link>https://driftdiffusion.com/posts/metropolis-recovery/</link>
   <description><![CDATA[ 
 
 
@@ -2690,7 +2690,7 @@ font-style: inherit;">"Heart rate (bpm)"</span>)</span></code></pre></div>
 <div id="fig-data" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/metropolis-recovery/index_files/figure-html/fig-data-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/metropolis-recovery/index_files/figure-html/fig-data-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;1.​ Simulated recovery: observations (points) and true curve (dashed line).
@@ -3205,7 +3205,7 @@ font-style: inherit;">"(s, log scale)"</span>))</span></code></pre></div>
 <div id="fig-traces" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-traces-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/metropolis-recovery/index_files/figure-html/fig-traces-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/metropolis-recovery/index_files/figure-html/fig-traces-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-traces-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;2.​ Trace plots of <img src="https://latex.codecogs.com/png.latex?%5Ctau"> over the first 3000 iterations of the four chains (one shade of grey per chain). After a short transient they explore the same region.
@@ -3645,7 +3645,7 @@ font-style: inherit;">"Density"</span>)</span></code></pre></div>
 <div id="fig-tau" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-tau-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/metropolis-recovery/index_files/figure-html/fig-tau-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/metropolis-recovery/index_files/figure-html/fig-tau-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-tau-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;3.​ Prior (dashed) and posterior (solid) of the time constant <img src="https://latex.codecogs.com/png.latex?%5Ctau">. The dotted vertical line marks the true value.
@@ -3843,7 +3843,7 @@ font-style: inherit;">"Heart rate (bpm)"</span>)</span></code></pre></div>
 <div id="fig-predictive" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-predictive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://USUARIO.github.io/deriva-difusion/posts/metropolis-recovery/index_files/figure-html/fig-predictive-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
+<img src="https://driftdiffusion.com/posts/metropolis-recovery/index_files/figure-html/fig-predictive-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-predictive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Fig.&nbsp;4.​ Posterior predictive check. Dark band: 95% interval for the mean curve. Light band: 95% interval for new observations. Points: data.
@@ -3925,7 +3925,7 @@ font-style: inherit;">1</span>)</span></code></pre></div>
 </div>
 </div></section></div> ]]></description>
   <category>bayesian</category>
-  <guid>https://USUARIO.github.io/deriva-difusion/posts/metropolis-recovery/</guid>
+  <guid>https://driftdiffusion.com/posts/metropolis-recovery/</guid>
   <pubDate>Tue, 20 Oct 2026 03:00:00 GMT</pubDate>
 </item>
 </channel>

@@ -1,1 +1,1 @@
-Sitemap: https://USUARIO.github.io/deriva-difusion/sitemap.xml
+Sitemap: https://driftdiffusion.com/sitemap.xml
