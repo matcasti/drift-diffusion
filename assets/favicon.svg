@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .p { fill: #fcfcfb; } .i { stroke: #121212; }
+    @media (prefers-color-scheme: dark) { .p { fill: #0e0e0e; } .i { stroke: #ebebe9; } }
+  </style>
+  <rect class="p" width="64" height="64" rx="10"/>
+  <path class="i" fill="none" stroke-width="1.5" stroke-dasharray="2 4" d="M8 32h48"/>
+  <path class="i" fill="none" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"
+        d="M8 14l5 12 4-5 5 14 4-9 5 13 4-11 5 8 4-10 5 9 4-6 3 4"/>
+</svg>

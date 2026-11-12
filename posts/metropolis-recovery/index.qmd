@@ -1,0 +1,325 @@
+---
+title: "How fast does the heart recover? Metropolis–Hastings from scratch"
+description: "We write a Metropolis sampler in twenty lines of R to estimate the time constant with which heart rate returns to rest after exercise, and carry its uncertainty all the way to a clinical index."
+date: 2026-10-20
+categories: [bayesian]
+keywords: [Metropolis–Hastings, MCMC, Bayesian inference, heart-rate recovery, posterior uncertainty]
+---
+
+```{r}
+#| label: setup
+#| include: false
+source("R/tema.R")
+```
+
+## The problem {#sec-problem}
+
+When exercise stops, heart rate does not drop at once: it descends towards
+rest along a roughly exponential curve. The early part of that descent
+mostly reflects vagal reactivation [@imai1994], and a slow recovery over the
+first minute is associated with higher mortality [@cole1999]. The speed of
+recovery is therefore a cheap, non-invasive window onto the autonomic
+control of the heart.
+
+The simplest model that captures the idea is
+
+$$
+\mathrm{HR}(t) \;=\; \mathrm{HR}_\infty + A\,e^{-t/\tau} + \varepsilon_t,
+\qquad \varepsilon_t \sim \mathcal{N}(0, \sigma^2),
+$$ {#eq-model}
+
+where $\mathrm{HR}_\infty$ is the resting rate, $A$ the amplitude of the
+descent and $\tau$ the **time constant**: the number of seconds heart rate
+takes to cover 63% of the way back. We want to estimate $\tau$ and, above
+all, to know *how much* we know about it.
+
+## Data with a known truth {#sec-data}
+
+To be able to check the method we simulate a five-minute recovery, sampled
+every five seconds, with parameters we know.
+
+```{r}
+#| label: fig-data
+#| fig-cap: "Simulated recovery: observations (points) and true curve (dashed line)."
+set.seed(1930)
+
+hr_mean <- function(t, hr_rest, A, tau) hr_rest + A * exp(-t / tau)
+
+truth <- c(hr_rest = 68, A = 62, tau = 75, sigma = 3)
+t <- seq(0, 300, by = 5)
+y <- hr_mean(t, 68, 62, 75) + rnorm(length(t), 0, truth[["sigma"]])
+dat <- data.frame(t, y)
+
+ggplot(dat, aes(t, y)) +
+  geom_function(fun = hr_mean, args = list(hr_rest = 68, A = 62, tau = 75),
+                linetype = "dashed", colour = "grey45") +
+  geom_point() +
+  labs(x = "Time since end of exercise (s)", y = "Heart rate (bpm)")
+```
+
+## The Bayesian model {#sec-bayes}
+
+Three of the four parameters are positive. Rather than imposing
+constraints, we work on an unconstrained scale,
+
+$$
+\boldsymbol{\phi} = \bigl(\mathrm{HR}_\infty,\; \log A,\; \log\tau,\; \log\sigma\bigr),
+$$
+
+and place the priors directly on $\boldsymbol{\phi}$:
+
+| Parameter | Prior | 95% prior interval |
+|:--|:--|:--|
+| $\mathrm{HR}_\infty$ | $\mathcal{N}(70,\,15^2)$ | 41 to 99 bpm |
+| $\log A$ | $\mathcal{N}(\log 60,\,0.5^2)$ | $A$ between 23 and 160 bpm |
+| $\log\tau$ | $\mathcal{N}(\log 60,\,0.75^2)$ | $\tau$ between 14 and 261 s |
+| $\log\sigma$ | $\mathcal{N}(\log 3,\,1^2)$ | $\sigma$ between 0.4 and 21 bpm |
+
+: Weakly informative priors. {#tbl-priors}
+
+These priors rule out the physiologically absurd and little else. By Bayes'
+theorem, the posterior is proportional to likelihood times prior,
+
+$$
+p(\boldsymbol{\phi} \mid y) \;\propto\;
+\prod_{i=1}^{n} \mathcal{N}\!\bigl(y_i \mid \mathrm{HR}_\infty + A\,e^{-t_i/\tau},\, \sigma^2\bigr)
+\; p(\boldsymbol{\phi}),
+$$ {#eq-posterior}
+
+and in R all we need is its logarithm:
+
+```{r}
+#| label: log-posterior
+log_posterior <- function(phi, t, y) {
+  mu <- phi[1] + exp(phi[2]) * exp(-t / exp(phi[3]))
+  sum(dnorm(y, mu, exp(phi[4]), log = TRUE)) +   # likelihood
+    dnorm(phi[1], 70, 15, log = TRUE) +           # priors
+    dnorm(phi[2], log(60), 0.5, log = TRUE) +
+    dnorm(phi[3], log(60), 0.75, log = TRUE) +
+    dnorm(phi[4], log(3), 1, log = TRUE)
+}
+```
+
+## Metropolis in twenty lines {#sec-metropolis}
+
+The normalising constant of @eq-posterior is a four-dimensional integral
+that we never need to compute. The Metropolis algorithm
+[@metropolis1953; @hastings1970] builds a Markov chain whose stationary
+distribution is the posterior using only *ratios* of densities, in which
+that constant cancels.
+
+::: {#def-metropolis}
+## Random-walk Metropolis
+
+Given the current state $\boldsymbol{\phi}$:
+
+1. propose $\boldsymbol{\phi}' = \boldsymbol{\phi} + \boldsymbol{\eta}$, with
+   $\boldsymbol{\eta} \sim \mathcal{N}(\mathbf{0}, \operatorname{diag}(\mathbf{s}^2))$;
+2. accept the proposal with probability
+   $\alpha = \min\!\bigl\{1,\; p(\boldsymbol{\phi}' \mid y) \,/\, p(\boldsymbol{\phi} \mid y)\bigr\}$;
+3. if rejected, repeat $\boldsymbol{\phi}$ as the next state.
+:::
+
+```{r}
+#| label: metropolis
+metropolis <- function(log_post, init, n_iter, step, ...) {
+  d <- length(init)
+  chain <- matrix(NA_real_, n_iter, d)
+  current <- init
+  lp <- log_post(current, ...)
+  accepted <- 0L
+  for (i in seq_len(n_iter)) {
+    proposal <- current + rnorm(d, 0, step)
+    lp_prop <- log_post(proposal, ...)
+    if (log(runif(1)) < lp_prop - lp) {          # accept with probability α
+      current <- proposal
+      lp <- lp_prop
+      accepted <- accepted + 1L
+    }
+    chain[i, ] <- current
+  }
+  list(chain = chain, acceptance = accepted / n_iter)
+}
+```
+
+We launch four chains from dispersed starting points. The step sizes in
+`step` were tuned by hand until the acceptance rate fell within the range
+regarded as efficient: between 0.23, the theoretical optimum in high
+dimension [@roberts1997], and 0.44, the optimum for a single parameter.
+
+```{r}
+#| label: sampling
+n_iter <- 30000
+step <- c(0.45, 0.02, 0.04, 0.09)
+
+chains <- lapply(1:4, function(k) {
+  init <- c(rnorm(1, 70, 10), log(60) + rnorm(1, 0, 0.4),
+            log(60) + rnorm(1, 0, 0.6), log(3) + rnorm(1, 0, 0.5))
+  metropolis(log_posterior, init, n_iter, step, t = t, y = y)
+})
+
+round(sapply(chains, `[[`, "acceptance"), 3)
+```
+
+## Did it converge? {#sec-diagnostics}
+
+Before looking at results, the chains deserve some distrust.
+@fig-traces shows the first iterations of $\tau$: all four forget their
+starting point within a few hundred steps and then mix together.
+
+```{r}
+#| label: fig-traces
+#| fig-cap: "Trace plots of $\\tau$ over the first 3000 iterations of the four chains (one shade of grey per chain). After a short transient they explore the same region."
+#| fig-height: 3.3
+traces <- do.call(rbind, lapply(1:4, function(k) {
+  data.frame(iter = 1:3000, tau = exp(chains[[k]]$chain[1:3000, 3]),
+             chain = factor(k))
+}))
+
+ggplot(traces, aes(iter, tau, colour = chain)) +
+  geom_line(linewidth = 0.3) +
+  scale_colour_manual(values = dd_tinta, guide = "none") +
+  scale_y_log10() +
+  labs(x = "Iteration", y = expression(tau ~ "(s, log scale)"))
+```
+
+We discard the first half of each chain as warm-up and compute the
+$\widehat{R}$ statistic [@gelman2013], which compares between-chain and
+within-chain variance; values close to 1 indicate that all chains describe
+the same distribution.
+
+```{r}
+#| label: rhat
+posterior <- lapply(chains, function(x) x$chain[(n_iter / 2 + 1):n_iter, ])
+
+rhat <- function(lst, j) {
+  m <- sapply(lst, function(x) x[, j])
+  n <- nrow(m)
+  B <- n * var(colMeans(m))            # between-chain variance
+  W <- mean(apply(m, 2, var))          # within-chain variance
+  sqrt(((n - 1) / n * W + B / n) / W)
+}
+
+setNames(round(sapply(1:4, rhat, lst = posterior), 3),
+         c("hr_rest", "log_A", "log_tau", "log_sigma"))
+```
+
+## What we learned {#sec-results}
+
+We pool the four chains and return to the natural scale.
+
+```{r}
+#| label: tbl-posterior
+#| tbl-cap: "Posterior summary against the values used to simulate the data."
+phi <- do.call(rbind, posterior)
+draws <- data.frame(hr_rest = phi[, 1], A = exp(phi[, 2]),
+                    tau = exp(phi[, 3]), sigma = exp(phi[, 4]))
+
+tab <- t(sapply(draws, resumen_posterior))
+tab <- cbind(truth = truth[rownames(tab)], tab)
+rownames(tab) <- c("$\\mathrm{HR}_\\infty$ (bpm)", "$A$ (bpm)",
+                   "$\\tau$ (s)", "$\\sigma$ (bpm)")
+
+knitr::kable(tab, digits = 1,
+             col.names = c("Truth", "Mean", "SD", "2.5%", "97.5%"))
+```
+
+```{r}
+#| label: numbers
+#| include: false
+ci_tau <- quantile(draws$tau, c(0.025, 0.975))
+hrr60 <- draws$A * (1 - exp(-60 / draws$tau))
+ci_hrr <- quantile(hrr60, c(0.025, 0.975))
+rho <- cor(phi[, 1], phi[, 3])
+fmt <- function(x, d = 1) format(round(x, d), nsmall = d)
+```
+
+The posterior mean of $\tau$ is `r fmt(mean(draws$tau))` s, with a 95%
+credible interval from `r fmt(ci_tau[1])` to `r fmt(ci_tau[2])` s, which
+contains the true value of 75 s. @fig-tau shows the whole Bayesian update:
+a prior that allowed anything from 14 to 261 s ends up, after 61
+observations, concentrated in a range of about `r round(diff(ci_tau))`
+seconds.
+
+```{r}
+#| label: fig-tau
+#| fig-cap: "Prior (dashed) and posterior (solid) of the time constant $\\tau$. The dotted vertical line marks the true value."
+#| fig-height: 3.5
+grid <- data.frame(tau = seq(20, 160, length.out = 400))
+grid$prior <- dlnorm(grid$tau, log(60), 0.75)
+
+ggplot() +
+  geom_line(aes(tau, prior, linetype = "Prior"), grid, colour = "grey45") +
+  geom_density(aes(tau, linetype = "Posterior"), draws, fill = "grey60",
+               alpha = 0.25, linewidth = 0.55, key_glyph = "path") +
+  geom_vline(xintercept = 75, linetype = "dotted") +
+  scale_linetype_manual(values = c(Prior = "dashed", Posterior = "solid")) +
+  coord_cartesian(xlim = c(20, 160)) +
+  labs(x = expression(tau ~ "(s)"), y = "Density")
+```
+
+A more demanding check is the **posterior predictive**: simulate new data
+from the fitted model and see whether they look like the observed ones.
+
+```{r}
+#| label: fig-predictive
+#| fig-cap: "Posterior predictive check. Dark band: 95% interval for the mean curve. Light band: 95% interval for new observations. Points: data."
+sub <- draws[sample(nrow(draws), 2000), ]
+tg <- seq(0, 300, by = 2)
+
+curves <- sapply(tg, function(s) hr_mean(s, sub$hr_rest, sub$A, sub$tau))
+new_y <- curves + rnorm(length(curves), 0, sub$sigma)
+
+band <- function(m) apply(m, 2, quantile, c(0.025, 0.975))
+pred <- data.frame(t = tg, mean = colMeans(curves),
+                   c_lo = band(curves)[1, ], c_hi = band(curves)[2, ],
+                   y_lo = band(new_y)[1, ], y_hi = band(new_y)[2, ])
+
+ggplot(pred, aes(t)) +
+  geom_ribbon(aes(ymin = y_lo, ymax = y_hi), fill = "grey50", alpha = 0.18) +
+  geom_ribbon(aes(ymin = c_lo, ymax = c_hi), fill = "grey20", alpha = 0.4) +
+  geom_line(aes(y = mean)) +
+  geom_point(aes(t, y), dat, size = 1.1) +
+  labs(x = "Time since end of exercise (s)", y = "Heart rate (bpm)")
+```
+
+## From parameters to the clinical index {#sec-derived}
+
+The practical advantage of having posterior *draws* is that the uncertainty
+of any derived quantity comes for free. The usual clinical index is
+heart rate recovery at one minute,
+
+$$
+\mathrm{HRR}_{60} \;=\; \mathrm{HR}(0) - \mathrm{HR}(60) \;=\; A\,\bigl(1 - e^{-60/\tau}\bigr),
+$$ {#eq-hrr}
+
+and its posterior distribution is obtained by applying @eq-hrr to every
+draw:
+
+```{r}
+#| label: hrr60
+hrr60 <- draws$A * (1 - exp(-60 / draws$tau))
+round(resumen_posterior(hrr60), 1)
+```
+
+That is, `r fmt(mean(hrr60))` bpm, with a 95% interval from
+`r fmt(ci_hrr[1])` to `r fmt(ci_hrr[2])` bpm (the true value is
+`r fmt(62 * (1 - exp(-60 / 75)))`). No delta method or asymptotic
+approximation was needed.
+
+## Limits and what comes next {#sec-limits}
+
+Two honest caveats. The first is statistical: $\mathrm{HR}_\infty$ and
+$\log\tau$ are strongly correlated in the posterior ($\rho =$
+`r fmt(rho, 2)`), because a slower recovery towards a lower resting rate
+looks very much like a faster one towards a higher resting rate. A random
+walk with independent steps explores such diagonal ridges poorly; that is
+why a four-parameter problem needed tens of thousands of iterations.
+Hamiltonian methods handle this far better.
+
+The second is physiological: @eq-model assumes independent errors, but real
+heart rate fluctuates with memory. Neighbouring beats resemble each other.
+Ignoring this makes the intervals too optimistic. The remedy is to model
+the noise as a stochastic process with temporal correlation, and the
+simplest of them all is the
+[Ornstein–Uhlenbeck process](../ornstein-uhlenbeck/index.qmd).

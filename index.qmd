@@ -1,0 +1,58 @@
+---
+pagetitle: "Bayesian statistics, stochastic processes and physiology in R"
+description: "Bayesian statistics, stochastic processes and neuro-immuno-physiological modelling in R."
+toc: false
+page-layout: full
+title-block-style: none
+listing:
+  id: posts
+  contents: "posts/*/index.qmd"
+  template: assets/indice.ejs
+  template-params:
+    id: posts
+    heading: "Posts"
+    all: "all"
+    empty: "No posts in this category."
+    page-size: 12
+  sort: "date desc"
+  date-format: "YYYY-MM-DD"
+  page-size: 12
+  categories: false
+  fields: [title, description, date, categories, reading-time]
+  feed:
+    title: "Drift & Diffusion"
+    description: "Bayesian statistics, stochastic processes and neuro-immuno-physiological modelling in R."
+---
+
+::::: {.dd-hero}
+
+```{=html}
+<canvas id="dd-paths" aria-hidden="true"></canvas>
+```
+
+:::: {.dd-hero-inner}
+
+[A modelling notebook]{.dd-kicker}
+
+[Drift *&* Diffusion]{.dd-title role="heading" aria-level="1"}
+
+::: {.dd-eq}
+$$
+\mathrm{d}X_t \;=\; \underbrace{\theta\,(\mu - X_t)\,\mathrm{d}t}_{\text{drift}} \;+\; \underbrace{\sigma\,\mathrm{d}W_t}_{\text{diffusion}}
+$$
+:::
+
+[Bayesian statistics, stochastic processes and neuro-immuno-physiological modelling in R.]{.dd-lede}
+
+::::
+
+```{=html}
+<button type="button" class="dd-scroll" aria-label="Scroll to the posts"></button>
+```
+
+[Ornstein–Uhlenbeck paths simulated live: the mean $\mu$ follows your cursor (or your finger).]{.dd-hero-note}
+
+:::::
+
+::: {#posts}
+:::

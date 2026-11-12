@@ -1,0 +1,90 @@
+project:
+  type: website
+  output-dir: _site
+  # El código R de cada entrada se ejecuta desde la raíz del proyecto,
+  # de modo que `source("R/tema.R")` funciona igual en RStudio y al renderizar.
+  execute-dir: project
+  render:
+    - "*.qmd"
+    - "posts/**/*.qmd"
+
+lang: en
+
+website:
+  title: "Drift & Diffusion"
+  description: "Bayesian statistics, stochastic processes and neuro-immuno-physiological modelling in R."
+  # CAMBIAR: URL pública del sitio (necesaria para el RSS y las tarjetas sociales).
+  site-url: "https://USUARIO.github.io/deriva-difusion"
+  favicon: assets/favicon.svg
+  back-to-top-navigation: true
+  search:
+    location: navbar
+    type: overlay
+  navbar:
+    title: "Drift & Diffusion"
+    pinned: false
+    right:
+      - text: "Posts"
+        href: index.qmd
+      - text: "About"
+        href: about.qmd
+      - icon: rss
+        href: index.xml
+        aria-label: "RSS"
+  page-footer:
+    center: "© 2026 · Quarto + R · ∎"
+
+# Pies al estilo de revista: «Fig. 1.» y «Table I.» (se componen en versalitas)
+crossref:
+  fig-title: "Fig."
+  tbl-title: "Table"
+  # el punto va con un espacio de ancho cero: "." solo se tomaría por una ruta
+  title-delim: ".\u200B"
+  fig-prefix: "Fig."
+  tbl-prefix: "Table"
+  tbl-labels: "roman I"
+
+# Cabecera de artículo y «Cite as» (ver assets/journal.lua)
+filters:
+  - assets/journal.lua
+
+bibliography: references.bib
+csl: assets/numeric.csl
+
+format:
+  html:
+    theme:
+      light: [assets/base.scss, assets/acento.scss, assets/claro.scss]
+      dark: [assets/base.scss, assets/acento.scss, assets/oscuro.scss]
+    respect-user-color-scheme: true
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/"
+    include-after-body: assets/sitio.html
+    grid:
+      sidebar-width: 220px
+      body-width: 740px
+      margin-width: 280px
+      gutter-width: 2.2rem
+    toc: true
+    toc-depth: 3
+    link-external-newwindow: true
+    link-external-icon: false
+    smooth-scroll: true
+    anchor-sections: true
+    code-copy: hover
+    code-overflow: scroll
+    fig-format: svg
+    fig-align: center
+    citations-hover: true
+    footnotes-hover: true
+    crossrefs-hover: true
+
+execute:
+  # Los resultados se guardan en _freeze/: una entrada solo se vuelve a
+  # ejecutar cuando cambia su fuente. Con cientos de entradas el sitio
+  # sigue renderizándose en segundos.
+  freeze: auto
+  echo: true
+  warning: false
+  message: false

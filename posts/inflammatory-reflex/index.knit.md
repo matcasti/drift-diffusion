@@ -1,0 +1,348 @@
+---
+title: "The inflammatory reflex as a stochastic dynamical system"
+description: "A minimal R model of the neuro-immune circuit that restrains inflammation: three equations, a vagal feedback loop and noise. We simulate vagotomy and stimulation, and measure what feedback does to the variability of the response."
+date: 2026-11-10
+categories: [neuro-immuno-physiology, stochastic processes]
+keywords: [inflammatory reflex, vagus nerve, feedback control, stochastic dynamics, cytokines]
+---
+
+
+
+## The circuit {#sec-circuit}
+
+The nervous system does not merely find out about inflammation: it
+regulates it. Cytokines released in the periphery activate afferent fibres
+of the vagus nerve; the brainstem responds through the efferent branch, and
+that cholinergic signal ends up restraining the release of tumour necrosis
+factor by macrophages. It is a reflex arc in the strict sense, known as the
+**inflammatory reflex** [@tracey2002].
+
+The classic experimental evidence has two sides. In rats exposed to
+endotoxin, cutting the vagus increases the cytokine response, and
+stimulating it electrically attenuates it [@borovikova2000]. A good minimal
+model should reproduce both.
+
+## The model {#sec-model}
+
+We use three dimensionless variables: the load of the inflammatory
+stimulus $P$, the concentration of a pro-inflammatory cytokine $C$ and the
+efferent vagal activity $V$.
+
+$$
+\begin{aligned}
+\mathrm{d}P_t &= -k_P\,P_t\,\mathrm{d}t, \\[4pt]
+\mathrm{d}C_t &= \Bigl[\,\frac{k_C\,P_t}{1 + V_t/K_V} - d_C\,C_t\Bigr]\mathrm{d}t
+  \;+\; \sigma_C\,C_t\,\mathrm{d}W^{(1)}_t, \\[4pt]
+\mathrm{d}V_t &= \frac{1}{\tau_V}\Bigl[\,V_0 + g\,\frac{C_t}{K_C + C_t} - V_t\Bigr]\mathrm{d}t
+  \;+\; \sigma_V\,\mathrm{d}W^{(2)}_t .
+\end{aligned}
+$$ {#eq-model}
+
+The stimulus is cleared at rate $k_P$. The cytokine is produced in
+proportion to the stimulus, but vagal activity **divides** that production
+(the cholinergic brake), and it is eliminated at rate $d_C$. The third
+equation is the reflex: $V$ is an
+[Ornstein–Uhlenbeck process](../ornstein-uhlenbeck/index.qmd) whose mean is
+no longer constant but rises with the cytokine in a saturable way, with
+gain $g$. The noise in $C$ is multiplicative, so the concentration never
+becomes negative; the noise in $V$ is additive.
+
+::: {.callout-note}
+## A teaching model
+
+The parameters in @tbl-parameters are illustrative: they were chosen so
+that the cytokine peaks between one and two hours after the stimulus, as
+happens qualitatively with endotoxin, but they are **not fitted to data**.
+For models of acute inflammation with a detailed analysis, see
+[@reynolds2006].
+:::
+
+| Symbol | Meaning | Value |
+|:--|:--|--:|
+| $k_P$ | stimulus clearance (1/h) | 0.5 |
+| $k_C$ | cytokine production (1/h) | 2 |
+| $d_C$ | cytokine elimination (1/h) | 0.9 |
+| $K_V$ | vagal activity that halves production | 1 |
+| $V_0$ | basal vagal tone | 1 |
+| $g$ | reflex gain | 3 |
+| $K_C$ | afferent half-saturation cytokine level | 0.5 |
+| $\tau_V$ | vagal time constant (h) | 0.25 |
+| $\sigma_C,\ \sigma_V$ | noise intensities | 0.35 and 0.6 |
+
+: Model parameters. {#tbl-parameters}
+
+## Implementation {#sec-implementation}
+
+The system is non-linear, so there is no exact transition and we fall back
+on Euler–Maruyama, with a step fifty times smaller than the fastest time
+constant. The function simulates `n` paths at once and allows two
+interventions: severing the efferent branch and stimulating the nerve
+during a time window.
+
+
+::: {.cell layout-align="center"}
+
+```{.r .cell-code}
+par <- list(k_P = 0.5, k_C = 2, d_C = 0.9, K_V = 1, V0 = 1, g = 3,
+            K_C = 0.5, tau_V = 0.25, sigma_C = 0.35, sigma_V = 0.6)
+
+simulate <- function(par, n = 1, hours = 12, dt = 0.005, P0 = 1,
+                     efferent = TRUE, stimulus = 0, window = c(0, 2)) {
+  steps <- round(hours / dt)
+  t <- seq(0, hours, by = dt)
+  P <- P0 * exp(-par$k_P * t)                      # exact solution of dP
+  C <- V <- matrix(0, steps + 1, n)
+  V[1, ] <- par$V0
+  for (i in seq_len(steps)) {
+    u <- if (t[i] >= window[1] && t[i] < window[2]) stimulus else 0
+    brake <- if (efferent) 1 / (1 + pmax(V[i, ], 0) / par$K_V) else 1
+    dW <- matrix(rnorm(2 * n, 0, sqrt(dt)), nrow = 2)
+    C[i + 1, ] <- C[i, ] +
+      (par$k_C * P[i] * brake - par$d_C * C[i, ]) * dt +
+      par$sigma_C * C[i, ] * dW[1, ]
+    target <- par$V0 + par$g * C[i, ] / (par$K_C + C[i, ]) + u
+    V[i + 1, ] <- V[i, ] + (target - V[i, ]) / par$tau_V * dt +
+      par$sigma_V * dW[2, ]
+  }
+  list(t = t, P = P, C = C, V = if (efferent) V else 0 * V)
+}
+```
+:::
+
+
+## Three experiments without noise {#sec-experiments}
+
+We first switch the noise off to see the deterministic skeleton, and repeat
+the classic experiments: intact reflex, vagotomy, and vagal stimulation
+during the first two hours.
+
+
+::: {.cell layout-align="center"}
+
+```{.r .cell-code}
+no_noise <- modifyList(par, list(sigma_C = 0, sigma_V = 0))
+
+conditions <- list(
+  "Intact reflex"     = simulate(no_noise),
+  "Vagotomy"          = simulate(no_noise, efferent = FALSE),
+  "Vagal stimulation" = simulate(no_noise, stimulus = 3)
+)
+
+long <- do.call(rbind, lapply(names(conditions), function(name) {
+  s <- conditions[[name]]
+  i <- seq(1, length(s$t), by = 8)               # one point in eight is plenty
+  rbind(
+    data.frame(t = s$t[i], value = s$C[i, 1], condition = name,
+               variable = "Cytokine C"),
+    data.frame(t = s$t[i], value = s$V[i, 1], condition = name,
+               variable = "Efferent vagal activity V")
+  )
+}))
+long$condition <- factor(long$condition, levels = names(conditions))
+long$variable <- factor(long$variable,
+                        levels = c("Cytokine C", "Efferent vagal activity V"))
+
+ggplot(long, aes(t, value, linetype = condition)) +
+  geom_line(linewidth = 0.6) +
+  facet_wrap(~variable, ncol = 1, scales = "free_y") +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted")) +
+  scale_x_continuous(breaks = seq(0, 12, 2)) +
+  labs(x = "Time since stimulus (h)", y = NULL)
+```
+
+::: {.cell-output-display}
+![Deterministic response to the same stimulus under three conditions. Top: cytokine. Bottom: efferent vagal activity reaching the tissue (zero after vagotomy).](index_files/figure-html/fig-experiments-1.svg){#fig-experiments fig-align='center' width=100%}
+:::
+:::
+
+
+
+::: {#tbl-experiments .cell layout-align="center" tbl-cap='Peak cytokine, time at which it occurs and total exposure (area under the curve) in each condition.'}
+
+```{.r .cell-code}
+summary_tab <- t(sapply(conditions, function(s) {
+  c(max(s$C), s$t[which.max(s$C)], sum(s$C) * 0.005)
+}))
+knitr::kable(summary_tab, digits = 2,
+             col.names = c("Peak", "Time of peak (h)", "AUC"))
+```
+
+::: {.cell-output-display}
+
+
+|                  | Peak| Time of peak (h)|  AUC|
+|:-----------------|----:|----------------:|----:|
+|Intact reflex     | 0.38|             1.19| 1.57|
+|Vagotomy          | 1.07|             1.47| 4.43|
+|Vagal stimulation | 0.22|             1.11| 1.14|
+
+
+:::
+:::
+
+
+
+
+The model reproduces both sides of the experiment. Without the efferent
+branch, the cytokine peak is
+2.8 times the one
+reached with the reflex intact, and it arrives later; with stimulation, it
+falls to 58%.
+Note the bottom panel too: with the reflex intact, vagal activity *rises on
+its own* in response to the cytokine and returns to its basal tone once the
+inflammation resolves.
+
+## How much does the gain matter? {#sec-gain}
+
+The gain $g$ summarises the sensitivity of the reflex arc. Sweeping it
+shows diminishing returns: most of the protection is obtained with moderate
+gains, because both the afferent pathway and the cholinergic brake
+saturate.
+
+
+::: {.cell layout-align="center"}
+
+```{.r .cell-code}
+sweep_g <- data.frame(g = seq(0, 10, by = 0.25))
+sweep_g$peak <- sapply(sweep_g$g, function(g) {
+  max(simulate(modifyList(no_noise, list(g = g)))$C)
+})
+
+ggplot(sweep_g, aes(g, peak)) +
+  geom_line() +
+  geom_point(data = subset(sweep_g, g == 3), size = 2.4) +
+  expand_limits(y = 0) +
+  labs(x = "Reflex gain, g", y = "Peak cytokine")
+```
+
+::: {.cell-output-display}
+![Peak cytokine as a function of reflex gain. The dot marks the reference value $g = 3$.](index_files/figure-html/fig-gain-1.svg){#fig-gain fig-align='center' width=100%}
+:::
+:::
+
+
+## With noise: a distribution of responses {#sec-noise}
+
+With the noise switched on, the same stimulus no longer produces one curve
+but a family of them. We simulate 2000 individuals with identical
+parameters.
+
+
+::: {.cell layout-align="center"}
+
+```{.r .cell-code}
+set.seed(2002)
+ensemble <- simulate(par, n = 2000)
+
+idx <- seq(1, length(ensemble$t), by = 10)
+q <- t(apply(ensemble$C[idx, ], 1, quantile,
+             c(0.05, 0.25, 0.5, 0.75, 0.95)))
+fan <- data.frame(t = ensemble$t[idx], q)
+names(fan) <- c("t", "q05", "q25", "q50", "q75", "q95")
+
+examples <- do.call(rbind, lapply(1:3, function(k) {
+  data.frame(t = ensemble$t[idx], C = ensemble$C[idx, k], k = k)
+}))
+
+ggplot(fan, aes(t)) +
+  geom_ribbon(aes(ymin = q05, ymax = q95), fill = "grey50", alpha = 0.2) +
+  geom_ribbon(aes(ymin = q25, ymax = q75), fill = "grey30", alpha = 0.3) +
+  geom_line(aes(y = C, group = k), examples,
+            linewidth = 0.3, colour = "grey35") +
+  geom_line(aes(y = q50), linewidth = 0.8) +
+  scale_x_continuous(breaks = seq(0, 12, 2)) +
+  labs(x = "Time since stimulus (h)", y = "Cytokine C")
+```
+
+::: {.cell-output-display}
+![Cytokine response with noise (2000 paths). Thick line: median. Bands: central 50% and 90%. Thin lines: three individual paths.](index_files/figure-html/fig-fan-1.svg){#fig-fan fig-align='center' width=100%}
+:::
+:::
+
+
+The interesting question is what feedback does to that spread. We compare
+the distribution of the cytokine peak with the reflex active ($g = 3$) and
+with a fixed vagal tone that does not respond to inflammation ($g = 0$).
+
+
+::: {.cell layout-align="center"}
+
+```{.r .cell-code}
+set.seed(2002)
+peaks_for <- function(g) {
+  apply(simulate(modifyList(par, list(g = g)), n = 2000)$C, 2, max)
+}
+lv <- c("Fixed tone (g = 0)", "Active reflex (g = 3)")
+peaks <- rbind(
+  data.frame(condition = lv[1], peak = peaks_for(0)),
+  data.frame(condition = lv[2], peak = peaks_for(3))
+)
+peaks$condition <- factor(peaks$condition, levels = lv)
+
+ggplot(peaks, aes(peak, linetype = condition)) +
+  geom_density(linewidth = 0.55, key_glyph = "path") +
+  scale_linetype_manual(values = c("dashed", "solid")) +
+  labs(x = "Peak cytokine", y = "Density")
+```
+
+::: {.cell-output-display}
+![Distribution of the cytokine peak over 2000 paths, with fixed vagal tone (dashed) and with the reflex active (solid).](index_files/figure-html/fig-peaks-1.svg){#fig-peaks fig-align='center' width=100%}
+:::
+:::
+
+
+
+::: {#tbl-peaks .cell layout-align="center" tbl-cap='Mean, standard deviation, coefficient of variation and 95th percentile of the cytokine peak.'}
+
+```{.r .cell-code}
+tab <- t(sapply(split(peaks$peak, peaks$condition), function(x) {
+  c(mean(x), sd(x), sd(x) / mean(x), quantile(x, 0.95))
+}))
+knitr::kable(tab, digits = 3, col.names = c("Mean", "SD", "CV", "P95"))
+```
+
+::: {.cell-output-display}
+
+
+|                      |  Mean|    SD|    CV|   P95|
+|:---------------------|-----:|-----:|-----:|-----:|
+|Fixed tone (g = 0)    | 0.699| 0.149| 0.213| 0.967|
+|Active reflex (g = 3) | 0.486| 0.092| 0.189| 0.651|
+
+
+:::
+:::
+
+
+
+
+The reflex shifts the whole distribution to the left: the mean falls by
+30% and the 95th percentile, which is where the dangerous
+responses live, by 33%. The absolute spread shrinks as
+well, although the coefficient of variation changes little: feedback
+mostly trims the *scale* of the response.
+
+One detail is worth not missing: the mean peak with noise
+(0.49) is higher than the deterministic peak
+(0.38). That is not a mistake. The maximum of a noisy path selects
+its upward excursions, so the mean of the maxima exceeds the maximum of the
+mean. Anyone fitting a deterministic model to individually observed peaks
+will tend to overestimate production.
+
+## What it teaches and what it does not {#sec-limits}
+
+Three equations are enough to organise the intuition: the reflex acts as a
+brake proportional to the threat, its absence amplifies and delays the
+response, and its main effect on variability is to compress the upper tail.
+But the model ignores almost everything else: anti-inflammatory cytokines,
+the hypothalamic–pituitary–adrenal axis, tissue damage and the sympathetic
+branch. And efferent vagal activity is not directly observable in humans;
+indices derived from heart rate variability are, at best, noisy and
+indirect measurements of $V$.
+
+That last point defines the next problem: estimating the parameters of
+@eq-model from partial, noisy observations is a problem of inference in
+state-space models, which is where the
+[Bayesian methods](../metropolis-recovery/index.qmd) and the stochastic
+processes of the previous posts meet.
+

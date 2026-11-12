@@ -1,0 +1,1226 @@
+/*-- scss:defaults --*/
+// ---------------------------------------------------------------------------
+// Deriva & Difusión — sistema tipográfico inspirado en LaTeX
+// Las variables $paper, $ink, $muted, $faint, $rule, $wash, $accent, $accent2
+// e $is-dark vienen de claro.scss / oscuro.scss. Los acentos y la inmersión
+// viven en acento.scss.
+// ---------------------------------------------------------------------------
+
+$serif: "LM Roman", "Latin Modern Roman", "CMU Serif", "Computer Modern Serif",
+  Georgia, "Times New Roman", serif;
+$display: "LM Roman Display", $serif;
+$caps: "LM Roman Caps", $serif;
+$mono: "LM Mono", "Latin Modern Mono", "CMU Typewriter Text", ui-monospace,
+  "SFMono-Regular", Menlo, Consolas, monospace;
+
+$font-family-sans-serif: $serif;
+$font-family-monospace: $mono;
+$headings-font-family: $display;
+$headings-font-weight: 700;
+
+$body-bg: $paper;
+$body-color: $ink;
+$primary: $ink;
+$secondary: $muted;
+$link-color: $ink;
+$link-hover-color: $ink;
+$border-color: $rule;
+$code-color: $ink;
+$code-bg: $wash;
+$code-block-bg: $wash;
+$text-muted: $muted;
+$blockquote-color: $muted;
+
+$navbar-bg: $paper;
+$navbar-fg: $ink;
+$navbar-hl: $ink;
+$footer-bg: $paper;
+$footer-fg: $muted;
+$toc-color: $ink;
+$toc-active-border: $ink;
+$toc-inactive-border: $rule;
+
+$callout-color-note: $muted;
+$callout-color-tip: $muted;
+$callout-color-important: $ink;
+$callout-color-caution: $muted;
+$callout-color-warning: $ink;
+
+$border-radius: 2px;
+$border-radius-sm: 2px;
+$border-radius-lg: 2px;
+$enable-shadows: false;
+
+/*-- scss:rules --*/
+
+// --- Fuentes: Latin Modern (GUST Font License), servidas desde el propio sitio
+// Quarto copia estos archivos junto al CSS compilado (rutas relativas a la raíz del proyecto)
+$fonts: "assets/fonts";
+@mixin lm($family, $file, $weight: 400, $style: normal) {
+  @font-face {
+    font-family: $family;
+    src: url("#{$fonts}/#{$file}.woff2") format("woff2");
+    font-weight: $weight;
+    font-style: $style;
+    font-display: swap;
+  }
+}
+@include lm("LM Roman", "lmroman10-regular");
+@include lm("LM Roman", "lmroman10-italic", 400, italic);
+@include lm("LM Roman", "lmroman10-bold", 700);
+@include lm("LM Roman", "lmroman10-bolditalic", 700, italic);
+@include lm("LM Roman Display", "lmroman17-regular");
+@include lm("LM Roman Display", "lmroman12-bold", 700);
+@include lm("LM Roman Caps", "lmromancaps10-regular");
+@include lm("LM Mono", "lmmono10-regular");
+@include lm("LM Mono", "lmmono10-italic", 400, italic);
+@include lm("LM Mono", "lmmonolt10-bold", 700);
+
+:root {
+  --paper: #{$paper};
+  --ink: #{$ink};
+  --muted: #{$muted};
+  --faint: #{$faint};
+  --rule: #{$rule};
+  --wash: #{$wash};
+  --serif: #{$serif};
+  --display: #{$display};
+  --caps: #{$caps};
+  --mono: #{$mono};
+  --measure: 38rem;
+  color-scheme: if($is-dark, dark, light);
+}
+
+// Transición suave entre páginas (navegadores con View Transitions)
+@view-transition {
+  navigation: auto;
+}
+
+html {
+  font-size: clamp(17px, 15px + 0.42vw, 21px);
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 4.5rem;
+}
+
+body {
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.58;
+  color: var(--ink);
+  background: var(--paper);
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+// --- Texto corrido ---------------------------------------------------------
+main.content {
+  p,
+  li {
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+  > p,
+  section > p {
+    text-align: justify;
+    text-wrap: pretty;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 0.045em;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--faint);
+  transition: text-decoration-color 0.15s ease;
+  &:hover {
+    color: inherit;
+    text-decoration-color: var(--ink);
+  }
+}
+
+strong,
+b {
+  font-weight: 700;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  opacity: 1;
+  margin: 2.5rem auto;
+  width: 38%;
+}
+
+blockquote,
+.blockquote {
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--muted);
+  border-left: 1px solid var(--ink);
+  padding: 0.1rem 0 0.1rem 1.2rem;
+  margin: 1.6rem 0;
+}
+
+// --- Encabezados, como \section y \subsection -------------------------------
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--display);
+  color: var(--ink);
+  letter-spacing: 0;
+  text-wrap: balance;
+  hyphens: none;
+}
+
+main.content {
+  h2,
+  h3,
+  h4 {
+    text-wrap: pretty;
+  }
+  h2 {
+    font-size: 1.44rem;
+    margin: 2.6rem 0 0.9rem;
+    padding: 0;
+    border: 0;
+  }
+  h3 {
+    font-size: 1.2rem;
+    margin: 2rem 0 0.7rem;
+  }
+  h4 {
+    font-size: 1rem;
+    margin: 1.6rem 0 0.5rem;
+  }
+}
+
+.header-section-number {
+  display: inline-block;
+  min-width: 1.5em;
+  margin-right: 0.35em;
+  color: inherit;
+  font-variant-numeric: lining-nums;
+}
+#TOC .header-section-number {
+  min-width: 1.1em;
+  margin-right: 0.15em;
+}
+
+a.anchorjs-link {
+  text-decoration: none;
+  color: var(--faint);
+}
+
+// --- Bloque de título, como \maketitle --------------------------------------
+#title-block-header.quarto-title-block {
+  text-align: center;
+  margin: clamp(1.5rem, 5vw, 3.5rem) 0 2.6rem;
+  display: flex;
+  flex-direction: column;
+  > div:has(> .description) {
+    order: 3;
+  }
+
+  .quarto-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1.title {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(1.75rem, 1.2rem + 2.4vw, 2.5rem);
+    line-height: 1.18;
+    margin: 0 0 0.6rem;
+    max-width: 22em;
+  }
+
+  .subtitle {
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--muted);
+    margin: 0 0 0.6rem;
+  }
+
+  .quarto-categories {
+    order: -1;
+    justify-content: center;
+    margin: 0 0 1.1rem;
+    gap: 0.4rem 1.1rem;
+  }
+
+  .quarto-category {
+    font-family: var(--caps);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    color: var(--muted);
+    border: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 1;
+    a {
+      color: inherit;
+      text-decoration: none;
+      &:hover {
+        color: var(--ink);
+      }
+    }
+  }
+
+  .quarto-title-meta {
+    order: 2;
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.1rem 0 !important;
+    margin: 0.7rem 0 0;
+    font-size: 1.05rem;
+    > div {
+      display: block !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      & + div::before {
+        content: "·";
+        margin: 0 0.7em;
+        color: var(--faint);
+      }
+      > div {
+        display: inline-block;
+      }
+    }
+    p {
+      margin: 0;
+      display: inline;
+    }
+  }
+  .quarto-title-meta-heading {
+    display: none !important;
+  }
+  .quarto-title-meta-contents {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  // El resumen del preámbulo se compone como un abstract
+  .description {
+    max-width: 31rem;
+    margin: 2.1rem auto 0 !important;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    text-align: justify;
+    hyphens: auto;
+    color: var(--ink);
+    p {
+      margin: 0;
+      display: inline;
+    }
+    &::before {
+      font-weight: 700;
+      content: "Abstract. ";
+    }
+  }
+}
+
+// --- Matemáticas ------------------------------------------------------------
+// KaTeX y Latin Modern comparten diseño (Computer Modern): mismo cuerpo
+body .katex {
+  font-size: 1em;
+}
+.katex-display {
+  margin: 1.3rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+  scrollbar-width: thin;
+}
+span.eqn-num,
+.math.display + .eqn-num {
+  font-family: var(--serif);
+}
+
+// Entornos tipo amsthm
+.theorem,
+.lemma,
+.corollary,
+.proposition,
+.conjecture {
+  margin: 1.5rem 0;
+  font-style: italic;
+  .theorem-title {
+    font-style: normal;
+  }
+  .katex {
+    font-style: normal;
+  }
+}
+.definition,
+.example,
+.exercise,
+.remark,
+.proof {
+  margin: 1.5rem 0;
+}
+.theorem-title strong {
+  font-weight: 700;
+  margin-right: 0.35em;
+}
+.proof {
+  .proof-title {
+    margin-right: 0.3em;
+  }
+  > p:last-child::after {
+    content: "∎";
+    float: right;
+    font-style: normal;
+  }
+}
+
+// --- Código, como un entorno verbatim ---------------------------------------
+code {
+  font-family: var(--mono);
+  font-size: 0.93em;
+  color: var(--ink);
+  font-variant-ligatures: none;
+}
+p code:not(.sourceCode),
+li code:not(.sourceCode),
+td code:not(.sourceCode) {
+  background: transparent;
+  padding: 0;
+  color: var(--ink);
+}
+
+div.sourceCode,
+pre.sourceCode {
+  background: var(--wash);
+  border: 0;
+  border-radius: 0;
+}
+div.sourceCode {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin: 1.3rem 0;
+  padding: 0.75rem 1rem;
+}
+pre {
+  font-size: 0.86rem;
+  line-height: 1.42;
+  margin: 0;
+  -webkit-overflow-scrolling: touch;
+}
+pre > code.sourceCode {
+  white-space: pre;
+}
+
+// Resaltado monocromo: el peso y la cursiva sustituyen al color
+pre > code.sourceCode > span,
+code.sourceCode span {
+  color: var(--ink) !important;
+  font-style: normal;
+  font-weight: 400;
+  text-decoration: none !important;
+}
+code.sourceCode span {
+  &.co,
+  &.do,
+  &.an,
+  &.cv,
+  &.in {
+    color: var(--faint) !important;
+    font-style: italic;
+  }
+  &.kw,
+  &.cf,
+  &.im,
+  &.pp {
+    font-weight: 700;
+  }
+  &.st,
+  &.ss,
+  &.vs,
+  &.ch,
+  &.sc {
+    color: var(--muted) !important;
+  }
+  &.cn,
+  &.bn {
+    font-style: italic;
+  }
+  &.ot,
+  &.at {
+    color: var(--muted) !important;
+  }
+}
+
+.code-copy-button {
+  color: var(--faint);
+  &:hover > .bi::before {
+    filter: grayscale(1);
+  }
+}
+
+// Salida de consola
+.cell-output pre,
+.cell-output-stdout pre {
+  background: transparent;
+  color: var(--muted);
+  border-left: 1px solid var(--rule);
+  padding: 0.15rem 0 0.15rem 1rem;
+  margin: 0.9rem 0 1.3rem;
+  code {
+    color: var(--muted);
+  }
+}
+
+.code-fold-block,
+details.code-fold > summary {
+  font-family: var(--caps);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+// --- Figuras ----------------------------------------------------------------
+.quarto-figure,
+figure.figure {
+  margin: 2rem 0;
+}
+figure img,
+.cell-output-display img {
+  max-width: 100%;
+  height: auto;
+}
+@if $is-dark {
+  // Los gráficos se generan en negro sobre fondo transparente:
+  // en modo oscuro basta invertirlos.
+  .cell-output-display img,
+  img.dd-invert {
+    filter: invert(1);
+  }
+}
+figcaption,
+.figure-caption,
+.table > caption,
+caption {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--ink);
+  text-align: center;
+  caption-side: bottom;
+  padding: 0.7rem 0 0;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+// --- Tablas, como booktabs --------------------------------------------------
+main.content table,
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--ink);
+  --bs-table-striped-bg: transparent;
+  --bs-table-striped-color: var(--ink);
+  --bs-table-hover-bg: transparent;
+  width: auto;
+  min-width: 55%;
+  margin: 1.6rem auto;
+  font-size: 0.95rem;
+  color: var(--ink);
+  border-collapse: collapse;
+  border-top: 0.09em solid var(--ink);
+  border-bottom: 0.09em solid var(--ink);
+  font-variant-numeric: lining-nums tabular-nums;
+
+  > :not(caption) > * > * {
+    padding: 0.36rem 0.9rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--ink);
+  }
+  > thead > tr > th {
+    font-weight: 400;
+    border-bottom: 0.05em solid var(--ink);
+    vertical-align: bottom;
+  }
+  > tbody {
+    border-top: 0;
+  }
+}
+.table > caption {
+  caption-side: top;
+  padding: 0 0 0.6rem;
+}
+.cell-output-display:has(> table),
+.cell:has(table) {
+  overflow-x: auto;
+}
+
+// --- Notas, citas y bibliografía --------------------------------------------
+.column-margin,
+.margin-caption,
+.aside {
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+sup,
+.footnote-ref {
+  font-variant-numeric: lining-nums;
+}
+#refs,
+.references {
+  font-size: 0.92rem;
+  line-height: 1.45;
+  .csl-entry {
+    margin-bottom: 0.55rem;
+    hyphens: auto;
+    overflow-wrap: anywhere;
+  }
+}
+#quarto-appendix.default {
+  border-top: 1px solid var(--rule);
+  background: transparent;
+  padding-top: 0.5rem;
+  section h2,
+  h2 {
+    font-size: 1.2rem;
+    border: 0;
+  }
+}
+.footnotes {
+  font-size: 0.9rem;
+}
+
+// --- Avisos (callouts) ------------------------------------------------------
+div.callout {
+  border: 0 !important;
+  border-left: 1px solid var(--ink) !important;
+  border-radius: 0;
+  background: transparent;
+  margin: 1.6rem 0;
+  color: var(--ink);
+
+  .callout-header {
+    background: transparent !important;
+    padding: 0 0 0 1.1rem;
+    font-family: var(--caps);
+    letter-spacing: 0.06em;
+    font-size: 0.9rem;
+    text-transform: lowercase;
+  }
+  .callout-icon-container {
+    display: none;
+  }
+  .callout-title-container {
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .callout-body,
+  .callout-body-container {
+    padding: 0.1rem 0 0 1.1rem;
+    font-size: 0.96rem;
+    > :last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+
+// --- Barra de navegación ----------------------------------------------------
+.navbar {
+  background: color-mix(in srgb, var(--paper) 88%, transparent) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+  box-shadow: none;
+}
+.navbar-brand,
+.navbar-title {
+  font-family: var(--caps);
+  font-size: 1.02rem;
+  letter-spacing: 0.07em;
+  text-transform: lowercase;
+  color: var(--ink) !important;
+  text-decoration: none;
+}
+.dd-mark {
+  font-family: var(--serif);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 1.12em;
+  margin-right: 0.55em;
+  padding-right: 0.6em;
+  border-right: 1px solid var(--rule);
+  .rm {
+    font-style: normal;
+  }
+  sub {
+    font-size: 0.68em;
+    bottom: -0.3em;
+  }
+}
+.navbar .nav-link,
+.navbar .navbar-nav .nav-link {
+  font-family: var(--caps);
+  font-size: 0.95rem;
+  letter-spacing: 0.07em;
+  text-transform: lowercase;
+  color: var(--muted) !important;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  &:hover,
+  &.active {
+    color: var(--ink) !important;
+  }
+}
+.navbar .nav-link.active .menu-text {
+  border-bottom: 1px solid var(--ink);
+}
+.navbar-toggler {
+  border: 0;
+  box-shadow: none !important;
+  color: var(--ink);
+}
+.navbar .quarto-color-scheme-toggle,
+.navbar #quarto-search .aa-DetachedSearchButton,
+.navbar .aa-DetachedSearchButtonIcon,
+.navbar .bi {
+  color: var(--muted) !important;
+}
+.quarto-color-scheme-toggle .bi::before,
+.navbar-toggler-icon {
+  filter: grayscale(1) if($is-dark, brightness(2), brightness(0.4));
+}
+@include media-breakpoint-down(lg) {
+  .navbar-collapse {
+    border-top: 1px solid var(--rule);
+    margin-top: 0.4rem;
+    padding: 0.4rem 0;
+  }
+}
+
+// Búsqueda
+.aa-DetachedOverlay,
+.aa-DetachedContainer,
+.aa-Panel,
+.aa-Form {
+  font-family: var(--serif);
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  border-color: var(--rule) !important;
+  box-shadow: none !important;
+}
+.aa-DetachedContainer {
+  border: 1px solid var(--rule);
+}
+.aa-Input {
+  color: var(--ink) !important;
+}
+#quarto-search-results .aa-Item[aria-selected="true"],
+.aa-Item[aria-selected="true"] .search-item {
+  background: var(--wash) !important;
+  color: var(--ink) !important;
+}
+.aa-Item mark,
+.search-match.mark {
+  background: transparent;
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+// --- Índice lateral ---------------------------------------------------------
+#TOC,
+.sidebar nav[role="doc-toc"] {
+  font-size: 0.84rem;
+  line-height: 1.35;
+  h2,
+  #toc-title {
+    font-family: var(--caps);
+    font-weight: 400;
+    font-size: 0.86rem;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    color: var(--muted);
+    border: 0;
+    margin: 0 0 0.6rem;
+    padding: 0;
+  }
+  ul {
+    border: 0;
+  }
+  > ul {
+    border-left: 1px solid var(--rule);
+  }
+  a.nav-link {
+    color: var(--muted);
+    text-decoration: none;
+    border-left: 1px solid transparent;
+    margin-left: -1px;
+    padding: 0.22rem 0 0.22rem 0.9rem;
+    &:hover {
+      color: var(--ink);
+    }
+    &.active {
+      color: var(--ink);
+      border-left-color: var(--ink);
+    }
+  }
+  ul ul a.nav-link {
+    padding-left: 1.7rem;
+  }
+}
+
+// --- Pie --------------------------------------------------------------------
+.nav-footer {
+  border-top: 1px solid var(--rule);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--caps);
+  font-size: 0.86rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  padding: 1.6rem 1rem;
+  margin-top: 4rem;
+  min-height: 0;
+  p {
+    margin: 0;
+  }
+}
+#quarto-back-to-top {
+  font-family: var(--caps);
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  background: var(--paper);
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  &:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+}
+
+// --- Barra de progreso de lectura -------------------------------------------
+#dd-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+// --- Portada ----------------------------------------------------------------
+.dd-hero {
+  position: relative;
+  // sangrado completo aunque la columna de texto sea estrecha
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  min-height: calc(100vh - 3.4rem);
+  min-height: calc(100svh - 3.4rem);
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+  margin-top: -1rem;
+  margin-bottom: 3.2rem;
+
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: pan-y;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 14%,
+      #000 86%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 14%,
+      #000 86%,
+      transparent 100%
+    );
+  }
+}
+main.content:has(.dd-hero) > #title-block-header {
+  display: none;
+}
+.dd-hero-inner {
+  box-sizing: border-box;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-top: clamp(1.5rem, 11vh, 7rem);
+  padding: 2.2rem 1.6rem 2.6rem;
+  max-width: 46rem;
+  pointer-events: none;
+  // halo de papel para que el texto respire sobre las trayectorias
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--paper) 94%, transparent) 0,
+    color-mix(in srgb, var(--paper) 80%, transparent) 62%,
+    transparent 100%
+  );
+
+  p {
+    margin: 0;
+    text-align: center;
+    hyphens: none;
+  }
+  .dd-kicker,
+  .dd-title,
+  .dd-lede {
+    display: block;
+  }
+  .dd-kicker {
+    font-family: var(--caps);
+    letter-spacing: 0.16em;
+    text-transform: lowercase;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .dd-title {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 1.2rem + 6.2vw, 5rem);
+    line-height: 1.04;
+    margin: 0.7rem 0 0.2rem;
+    em {
+      font-family: var(--serif);
+      font-size: 0.82em;
+      padding: 0 0.06em;
+    }
+  }
+  .dd-eq {
+    font-size: clamp(0.82rem, 0.55rem + 1.5vw, 1.18rem);
+    margin: 0.6rem 0 0.4rem;
+    .katex-display {
+      margin: 0;
+      overflow: visible;
+    }
+  }
+  .dd-lede {
+    font-size: 1.12rem;
+    font-style: italic;
+    color: var(--ink);
+    max-width: 26rem;
+    margin: 0 auto;
+    text-wrap: balance;
+  }
+}
+.dd-hero-note {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 0.7rem;
+  margin: 0;
+  padding: 0 1rem;
+  text-align: center !important;
+  font-size: 0.78rem;
+  color: var(--faint);
+  hyphens: none;
+}
+
+// --- Índice de entradas -----------------------------------------------------
+.dd-index-wrap {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+.dd-index-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem 1.5rem;
+  border-bottom: 0.09em solid var(--ink);
+  padding-bottom: 0.55rem;
+  h2 {
+    font-family: var(--display);
+    font-size: 1.44rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
+.dd-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.15rem;
+  button {
+    all: unset;
+    cursor: pointer;
+    font-family: var(--caps);
+    font-size: 0.86rem;
+    letter-spacing: 0.07em;
+    text-transform: lowercase;
+    color: var(--muted);
+    border-bottom: 1px solid transparent;
+    padding: 0.25rem 0;
+    &:hover {
+      color: var(--ink);
+    }
+    &:focus-visible {
+      outline: 1px solid var(--ink);
+      outline-offset: 3px;
+    }
+    &[aria-pressed="true"] {
+      color: var(--ink);
+      border-bottom-color: var(--ink);
+    }
+  }
+}
+.dd-index {
+  margin: 0;
+  padding: 0;
+}
+.dd-entry {
+  border-bottom: 1px solid var(--rule);
+  &:last-child {
+    border-bottom: 0.09em solid var(--ink);
+  }
+  > a {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    padding: 1.35rem 0 1.4rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  // «No. 03 … Título ······· fecha», como una tabla de contenidos
+  .dd-num {
+    font-family: var(--caps);
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    color: var(--faint);
+    font-variant-numeric: lining-nums;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+  .dd-entry-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+  .dd-entry-title {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 24rem;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.32rem;
+    line-height: 1.25;
+    margin: 0;
+    text-wrap: pretty;
+    span {
+      background: linear-gradient(var(--ink), var(--ink)) no-repeat 0 100% / 0 1px;
+      transition: background-size 0.35s ease;
+    }
+  }
+  // puntos guía
+  .dd-leader {
+    flex: 1 0 1.5rem;
+    height: 3px;
+    align-self: baseline;
+    position: relative;
+    top: -0.2em;
+    background: radial-gradient(circle, var(--faint) 0.85px, transparent 1.1px) 0 100% / 0.4rem 3px repeat-x;
+  }
+  .dd-entry-meta {
+    flex: none;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-variant-numeric: lining-nums tabular-nums;
+    white-space: nowrap;
+  }
+  .dd-entry-desc {
+    grid-column: 2;
+    margin: 0.35rem 0 0;
+    font-size: 0.96rem;
+    line-height: 1.48;
+    color: var(--muted);
+    hyphens: auto;
+  }
+  .listing-reading-time {
+    white-space: nowrap;
+  }
+  .dd-entry-cats {
+    grid-column: 2;
+    margin: 0.5rem 0 0;
+    font-family: var(--caps);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    color: var(--faint);
+    hyphens: none;
+  }
+  > a:hover {
+    .dd-num {
+      color: var(--ink);
+    }
+    .dd-entry-title span {
+      background-size: 100% 1px;
+    }
+  }
+}
+.listing-no-matching {
+  font-style: italic;
+  color: var(--muted);
+  padding: 1.5rem 0;
+  text-align: center;
+}
+.listing-pagination {
+  margin-top: 1.5rem;
+}
+.pagination {
+  justify-content: center;
+  gap: 0.2rem;
+  .page-link {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    text-decoration: none;
+    font-variant-numeric: lining-nums;
+  }
+  .page-item.active .page-link {
+    color: var(--ink);
+    background: transparent;
+    border-bottom: 1px solid var(--ink);
+  }
+}
+
+// --- Aparición suave al desplazarse -----------------------------------------
+@media (prefers-reduced-motion: no-preference) {
+  .dd-reveal {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .dd-reveal.dd-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// --- Móvil ------------------------------------------------------------------
+@include media-breakpoint-down(md) {
+  main.content > p,
+  main.content section > p {
+    text-align: left;
+  }
+  .dd-entry > a {
+    grid-template-columns: 3.6rem 1fr;
+    gap: 0.15rem 0.6rem;
+  }
+  .dd-entry .dd-entry-head {
+    flex-wrap: wrap;
+  }
+  .dd-entry .dd-entry-title {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+  .dd-entry .dd-leader {
+    display: none;
+  }
+  .dd-entry .dd-entry-meta {
+    order: 3;
+    padding-top: 0.2rem;
+  }
+  .dd-hero {
+    min-height: calc(100svh - 3.4rem);
+  }
+  .navbar-brand,
+  .navbar-title {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+  .dd-hero > p {
+    margin: 0;
+  }
+  .dd-hero-inner .dd-kicker {
+    letter-spacing: 0.1em;
+    font-size: 0.82rem;
+  }
+  // Ecuaciones numeradas en pantallas estrechas: el número sigue a la
+  // ecuación y el conjunto se desplaza horizontalmente si no cabe.
+  body .katex-display > .katex {
+    white-space: nowrap;
+    > .katex-html > .tag {
+      position: static;
+      display: inline-block;
+      margin-left: 1.4em;
+    }
+  }
+  pre {
+    font-size: 0.8rem;
+  }
+  .header-section-number {
+    min-width: 1.15em;
+  }
+  .dd-mark {
+    margin-right: 0.45em;
+    padding-right: 0.45em;
+  }
+  main.content table,
+  .table {
+    min-width: 100%;
+  }
+  div.sourceCode {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    padding: 0.7rem 0.75rem;
+  }
+}
+
+// --- Impresión --------------------------------------------------------------
+@media print {
+  .dd-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .navbar,
+  .nav-footer,
+  #dd-progress,
+  #quarto-margin-sidebar,
+  .dd-hero canvas {
+    display: none !important;
+  }
+  body {
+    font-size: 10.5pt;
+  }
+}

@@ -1,0 +1,11 @@
+---
+title: "404"
+toc: false
+number-sections: false
+---
+
+$$
+\Pr(\text{page} \mid \text{URL}) = 0
+$$
+
+This page does not exist. Back to the [index](index.qmd).

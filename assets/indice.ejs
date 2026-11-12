@@ -1,0 +1,51 @@
+<%
+// Plantilla del índice de entradas (ES y EN comparten este archivo).
+// Los textos llegan por `template-params` desde index.qmd / en/index.qmd.
+const t = Object.assign(
+  { id: "entradas", heading: "Entradas", all: "todas", empty: "Sin entradas en esta categoría.", "page-size": 12 },
+  templateParams || {}
+);
+const cats = [];
+for (const item of items) {
+  for (const c of (item.categories || [])) {
+    if (!cats.includes(c)) cats.push(c);
+  }
+}
+const total = items.length;
+%>
+
+```{=html}
+<div class="dd-index-wrap">
+<div class="dd-index-head">
+  <h2 class="no-anchor"><%= t.heading %></h2>
+  <div class="dd-filters" role="group" aria-label="<%= t.heading %>">
+    <button type="button" data-cat="" data-b64="" aria-pressed="true"><%= t.all %></button>
+    <% for (const c of cats) { %>
+    <button type="button" data-cat="<%= c %>" data-b64="<%= utils.b64encode(c) %>" aria-pressed="false"><%= c %></button>
+    <% } %>
+  </div>
+</div>
+<div class="list dd-index">
+<% items.forEach((item, i) => { %>
+<article class="dd-entry" <%= metadataAttrs(item) %>>
+  <a href="<%- item.path %>" class="no-external">
+    <span class="dd-num" aria-hidden="true">No. <%= String(total - i).padStart(2, "0") %></span>
+    <div class="dd-entry-head">
+      <h3 class="dd-entry-title no-anchor listing-title"><span><%= item.title %></span></h3>
+      <span class="dd-leader" aria-hidden="true"></span>
+      <% if (item.date) { %><span class="dd-entry-meta listing-date"><%= item.date %></span><% } %>
+    </div>
+    <% if (item.description) { %><p class="dd-entry-desc listing-description"><%= item.description %></p><% } %>
+    <% if (item.categories || item['reading-time']) { %><p class="dd-entry-cats"><% if (item.categories) { %><span class="listing-categories"><%= item.categories.join(" · ") %></span><% } %><% if (item.categories && item['reading-time']) { %> · <% } %><% if (item['reading-time']) { %><span class="listing-reading-time"><%= item['reading-time'] %></span><% } %></p><% } %>
+  </a>
+</article>
+<% }) %>
+</div>
+<div class="listing-no-matching d-none"><%= t.empty %></div>
+<% if (t["page-size"] < items.length) { %>
+<nav id="<%- t.id %>-pagination" class="listing-pagination" aria-label="Page Navigation">
+  <ul class="pagination"></ul>
+</nav>
+<% } %>
+</div>
+```

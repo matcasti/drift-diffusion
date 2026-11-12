@@ -1,0 +1,39 @@
+---
+title: "About"
+description: "What this notebook is, how it is made and how to cite it."
+toc: false
+number-sections: false
+---
+
+**Drift & Diffusion** is a modelling notebook. It is named after the two
+terms of a stochastic differential equation: the *drift*, which is what the
+system would do if nothing disturbed it, and the *diffusion*, which is
+everything else. Most of the interesting physiology happens in the
+conversation between the two.
+
+Posts move along three axes:
+
+- **Bayesian statistics**: inference as the updating of uncertainty, with
+  algorithms written by hand before reaching for libraries.
+- **Stochastic processes**: stochastic differential equations, state-space
+  models and filtering.
+- **Neuro-immuno-physiological modelling**: dynamical systems for autonomic
+  control, inflammation and their couplings.
+
+## Principles
+
+Every post is a reproducible document: the text, the equations and the R
+code behind each figure live in the same file. Models are deliberately
+small, and simulated data are always labelled as such. Numbers quoted in
+the text are computed at render time, never copied by hand.
+
+## Colophon
+
+The site is built with [Quarto](https://quarto.org) and R. The typeface is
+Latin Modern, the family $\LaTeX$ sets by default, and equations are
+rendered with $\KaTeX$. The palette is ink and paper, with two accents that carry meaning, as in
+the equation on the front page: <span style="color: var(--accent)">ember</span>
+for the drift and <span style="color: var(--accent2)">cyan</span> for the
+diffusion.
+
+<!-- To complete: name, affiliation, contact and content licence. -->

@@ -1,0 +1,10 @@
+Package: derivadifusion
+Title: Dependencias de R del blog Deriva & Difusión
+Version: 0.1.0
+Description: Este archivo solo declara los paquetes de R que usan las
+    entradas, para que GitHub Actions (y cualquier colaborador) pueda
+    instalarlos con pak::local_install_deps().
+Imports:
+    ggplot2 (>= 3.4.0),
+    knitr,
+    rmarkdown

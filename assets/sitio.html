@@ -1,0 +1,323 @@
+<div id="dd-progress" aria-hidden="true"></div>
+<script>
+/* Drift & Diffusion — comportamiento del sitio (sin dependencias).
+   1. Marca de la barra.
+   2. Cursor global, progreso de lectura y parallax de la portada.
+   3. Portada: trayectorias de Ornstein–Uhlenbeck simuladas en vivo.
+   4. Índice: filtros y aparición suave. */
+(function () {
+  "use strict";
+  var doc = document;
+  var root = doc.documentElement;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---- 1. Marca -----------------------------------------------------------
+  var brand = doc.querySelector(".navbar-brand .navbar-title, .navbar-title");
+  if (brand) {
+    brand.innerHTML =
+      '<span class="dd-mark" aria-hidden="true"><span class="rm">d</span>X<sub>t</sub></span>' +
+      brand.textContent.replace("&", "&amp;");
+  }
+
+  // ---- 1b. Revista: cabecera dentro del título y numeración de pies -------
+  var jfront = doc.querySelector(".dd-jfront");
+  var header = doc.getElementById("title-block-header");
+  if (jfront && header) {
+    var line = jfront.querySelector(".dd-jline");
+    var meta = jfront.querySelector(".dd-jmeta");
+    if (line) header.insertBefore(line, header.firstChild);
+    if (meta) header.appendChild(meta);
+    jfront.remove();
+  }
+  doc.querySelectorAll("figcaption.quarto-float-caption").forEach(function (cap) {
+    var t = cap.firstChild;
+    if (!t || t.nodeType !== 3) return;
+    var m = /^\s*((?:Fig\.|Table)[\s\u00a0]+[0-9IVXLC]+\.)\u200b?\s*/.exec(t.nodeValue);
+    if (!m) return;
+    var span = doc.createElement("span");
+    span.className = "dd-capnum";
+    span.textContent = m[1].replace(/\u00a0/g, " ");
+    t.nodeValue = t.nodeValue.slice(m[0].length);
+    cap.insertBefore(span, t);
+  });
+
+  // ---- 2. Progreso y parallax -------------------------------------
+  var bar = doc.getElementById("dd-progress");
+  var hero = doc.querySelector(".dd-hero");
+
+  var ticking = false;
+  var paint = function () {
+    var max = root.scrollHeight - root.clientHeight;
+    if (bar) bar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, root.scrollTop / max) : 0) + ")";
+    if (hero && !reduce) {
+      var p = Math.max(0, Math.min(1, root.scrollTop / (hero.offsetHeight * 0.8)));
+      hero.style.setProperty("--hero-p", p.toFixed(3));
+    }
+    ticking = false;
+  };
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(paint);
+      }
+    },
+    { passive: true }
+  );
+  window.addEventListener("resize", paint);
+  paint();
+
+  var cue = doc.querySelector(".dd-scroll");
+  if (cue) {
+    cue.addEventListener("click", function () {
+      var target = doc.querySelector(".dd-index-wrap") || doc.getElementById("posts");
+      if (target) target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    });
+  }
+
+  // ---- 3. Portada: dX = θ(μ − X)dt + σ dW ---------------------------------
+  // Deriva (ámbar): la media μ, que sigue a tu cursor.
+  // Difusión (cian): el conjunto de trayectorias que ella arrastra.
+  // Tinta: una trayectoria destacada.
+  var canvas = doc.getElementById("dd-paths");
+  if (canvas && canvas.getContext && hero) {
+    var ctx = canvas.getContext("2d");
+    var K = 11; // trayectorias
+    var theta = 0.55; // 1/s: velocidad de reversión a la media
+    var sigma = 0.3; // intensidad del ruido
+    var dt = 1 / 60;
+    var speed = 1; // px por paso
+    var mu = 0,
+      muTarget = 0;
+    var W = 0,
+      H = 0,
+      N = 0,
+      paths = [],
+      muHist = [];
+    var ink = "#000",
+      cDrift = "#c2410c",
+      cDiff = "#0e7490",
+      dark = false;
+    // las trayectorias ocupan la franja que queda libre bajo el título
+    var band = { mid: 0, amp: 1 };
+    var inner = hero.querySelector(".dd-hero-inner");
+
+    var gauss = function () {
+      var u = 0,
+        v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    };
+    // transición exacta del proceso OU (no Euler): válida para cualquier dt
+    var a = Math.exp(-theta * dt);
+    var sd = sigma * Math.sqrt((1 - a * a) / (2 * theta));
+    var step = function (x, m) {
+      return m + (x - m) * a + sd * gauss();
+    };
+
+    var readColors = function () {
+      var cs = getComputedStyle(root);
+      ink = cs.getPropertyValue("--ink").trim() || ink;
+      cDrift = cs.getPropertyValue("--accent").trim() || cDrift;
+      cDiff = cs.getPropertyValue("--accent2").trim() || cDiff;
+      dark = cs.getPropertyValue("--is-dark").trim() === "1";
+    };
+    var resize = function () {
+      var r = hero.getBoundingClientRect();
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = Math.max(1, Math.round(r.width));
+      H = Math.max(1, Math.round(r.height));
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // offsetTop/offsetHeight ignoran las transformaciones de la animación de entrada
+      var top = inner ? inner.offsetTop + inner.offsetHeight - 14 : H * 0.5;
+      var free = Math.max(60, H - 70 - top);
+      band.mid = top + free / 2;
+      band.amp = Math.min(H * 0.24, free * 0.46);
+      var n = Math.ceil(W / speed) + 2;
+      if (n !== N) {
+        N = n;
+        paths = [];
+        muHist = [];
+        var stat = sigma / Math.sqrt(2 * theta);
+        for (var k = 0; k < K; k++) {
+          var x = stat * gauss() * 2.2,
+            p = new Float32Array(N);
+          for (var i = 0; i < N; i++) {
+            x = step(x, 0);
+            p[i] = x;
+          }
+          paths.push(p);
+        }
+        for (var j = 0; j < N; j++) muHist.push(0);
+      }
+    };
+    var advance = function () {
+      mu += (muTarget - mu) * 0.06;
+      for (var k = 0; k < K; k++) {
+        var p = paths[k];
+        p.copyWithin(0, 1);
+        p[N - 1] = step(p[N - 2], mu);
+      }
+      muHist.shift();
+      muHist.push(mu);
+    };
+    var trace = function (p) {
+      ctx.beginPath();
+      ctx.moveTo(0, band.mid - p[0] * band.amp);
+      for (var j = 1; j < N; j++) ctx.lineTo(j * speed, band.mid - p[j] * band.amp);
+      ctx.stroke();
+    };
+    var draw = function () {
+      ctx.clearRect(0, 0, W, H);
+      var mid = band.mid,
+        amp = band.amp;
+      // en oscuro, las trayectorias suman luz donde se cruzan
+      ctx.globalCompositeOperation = dark ? "lighter" : "source-over";
+
+      // difusión: el conjunto, en cian
+      ctx.strokeStyle = cDiff;
+      ctx.lineJoin = "round";
+      for (var k = 1; k < K; k++) {
+        ctx.globalAlpha = (dark ? 0.2 : 0.26) + 0.3 * (k / K);
+        ctx.lineWidth = 0.9;
+        trace(paths[k]);
+      }
+      // una trayectoria destacada, en tinta
+      ctx.globalCompositeOperation = "source-over";
+      ctx.strokeStyle = ink;
+      ctx.globalAlpha = 0.85;
+      ctx.lineWidth = 1.4;
+      trace(paths[0]);
+
+      // deriva: la media μ(t), en ámbar
+      ctx.strokeStyle = cDrift;
+      var pass = [{ w: 1.3, al: 0.9, dash: [3, 5] }];
+      for (var q = 0; q < pass.length; q++) {
+        ctx.lineWidth = pass[q].w;
+        ctx.globalAlpha = pass[q].al;
+        ctx.setLineDash(pass[q].dash);
+        ctx.beginPath();
+        for (var i = 0; i < N; i += 3) {
+          var y0 = mid - muHist[i] * amp;
+          if (i === 0) ctx.moveTo(0, y0);
+          else ctx.lineTo(i * speed, y0);
+        }
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    };
+
+    var running = false,
+      visible = true;
+    var loop = function () {
+      if (!running) return;
+      advance();
+      draw();
+      requestAnimationFrame(loop);
+    };
+    var start = function () {
+      if (running || reduce || !visible || doc.hidden) return;
+      running = true;
+      requestAnimationFrame(loop);
+    };
+    var stop = function () {
+      running = false;
+    };
+
+    // la media sigue al puntero: la deriva arrastra las trayectorias hacia él
+    var follow = function (clientX, clientY) {
+      var r = hero.getBoundingClientRect();
+      muTarget = Math.max(-1.1, Math.min(1.1, (band.mid - (clientY - r.top)) / band.amp));
+      // la retícula de la portada se ilumina bajo el cursor
+      hero.style.setProperty("--hx", clientX - r.left + "px");
+      hero.style.setProperty("--hy", clientY - r.top + "px");
+    };
+    var release = function () {
+      muTarget = 0;
+      hero.style.removeProperty("--hx");
+      hero.style.removeProperty("--hy");
+    };
+    hero.addEventListener("pointermove", function (e) {
+      follow(e.clientX, e.clientY);
+    });
+    hero.addEventListener("pointerdown", function (e) {
+      follow(e.clientX, e.clientY); // en pantallas táctiles basta un toque
+    });
+    hero.addEventListener("pointerleave", release);
+    hero.addEventListener("touchend", release, { passive: true });
+
+    readColors();
+    resize();
+    draw();
+    window.addEventListener("resize", function () {
+      resize();
+      draw();
+    });
+    // el cambio claro/oscuro de Quarto alterna una clase en <body>
+    new MutationObserver(function () {
+      setTimeout(function () {
+        readColors();
+        draw();
+      }, 80);
+    }).observe(doc.body, { attributes: true, attributeFilter: ["class"] });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) {
+        visible = es[0].isIntersecting;
+        if (visible) start();
+        else stop();
+      }).observe(hero);
+    }
+    doc.addEventListener("visibilitychange", function () {
+      if (doc.hidden) stop();
+      else start();
+    });
+    start();
+  }
+
+  // ---- 4. Índice: filtros y aparición ------------------------
+  var filters = doc.querySelectorAll(".dd-filters button");
+  var sync = function () {
+    var m = /category=([^&]*)/.exec(location.hash);
+    var current = m ? decodeURIComponent(m[1]) : "";
+    filters.forEach(function (b) {
+      b.setAttribute("aria-pressed", String((b.dataset.cat || "") === current));
+    });
+  };
+  filters.forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (window.quartoListingCategory) window.quartoListingCategory(b.dataset.b64 || "");
+      filters.forEach(function (o) {
+        o.setAttribute("aria-pressed", String(o === b));
+      });
+    });
+  });
+  if (filters.length) {
+    sync();
+    window.addEventListener("hashchange", sync);
+  }
+
+  if (!reduce && "IntersectionObserver" in window) {
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add("dd-in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -6% 0px" }
+    );
+    doc.querySelectorAll(".dd-entry, main.content figure, main.content .quarto-figure").forEach(function (el, i) {
+      el.classList.add("dd-reveal");
+      if (el.classList.contains("dd-entry")) el.style.transitionDelay = (i % 6) * 60 + "ms";
+      io.observe(el);
+    });
+  }
+})();
+</script>

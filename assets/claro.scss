@@ -1,0 +1,13 @@
+/*-- scss:defaults --*/
+// Light mode: ink on paper, plus two accents that carry meaning:
+//   $accent  (ember) = drift      $accent2 (cyan) = diffusion
+// Papel apenas cálido (casi neutro, para no contrastar con las láminas blancas).
+$paper: #fbfaf7;
+$ink: #151413;
+$muted: #5a5855;
+$faint: #8b8985;
+$rule: #dcdad5;
+$wash: #f3f1ed;
+$accent: #c2410c;
+$accent2: #0e7490;
+$is-dark: false;

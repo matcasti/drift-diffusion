@@ -1,0 +1,12 @@
+# Defaults for every English post.
+author: "Matías Castillo-Aguilar"
+number-sections: true
+number-depth: 2
+toc: true
+code-fold: false
+code-tools: false
+reference-location: margin
+citation-location: document
+fig-cap-location: bottom
+tbl-cap-location: top
+title-block-banner: false
